@@ -1,0 +1,136 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hello", "Hi", "Good morning", "Hey", "Hi there",
+        "Ayubowan", "Kohomada", "Subha udasanak", "Kohomada oyata",
+        "Vanakkam", "Kaalai vanakkam", "Eppadi irukkinga", "Namaskaram"
+      ],
+      "responses": {
+        "en": "Hello! How can I help you with your studies today?",
+        "si": "ආයුබෝවන්! අද ඔබේ අධ්‍යයන කටයුතු සඳහා මට උපකාර කළ හැක්කේ කෙසේද?",
+        "ta": "வணக்கம்! இன்று உங்கள் படிப்பிற்கு நான் எப்படி உதவ முடியும்?"
+      }
+    },
+    {
+      "tag": "course_registration",
+      "patterns": [
+        "How to register for a course?", "enroll in class", "add a subject", "join a module",
+        "Kohomada course ekakata register wenne", "Mata vishayak add karanna one", "Class ekata enroll wenne kohomada",
+        "Oru padathil eppadi pathivu seivathu", "Vaguppil pathivu sei", "Course register panrathu eppadi"
+      ],
+      "responses": {
+        "en": "You can register for courses by navigating to the 'My Courses' tab in your student dashboard and clicking 'Add Course'.",
+        "si": "ඔබේ ශිෂ්‍ය උපකරණ පුවරුවේ 'මගේ පාඨමාලා' (My Courses) ටැබය වෙත ගොස් 'පාඨමාලාවක් එක් කරන්න' (Add Course) ක්ලික් කිරීමෙන් ඔබට ලියාපදිංචි විය හැක.",
+        "ta": "உங்கள் மாணவர் கட்டுப்பாட்டு பலகத்தில் உள்ள 'என் பாடங்கள்' (My Courses) தாவலுக்குச் சென்று 'பாடம் சேர்' (Add Course) என்பதைக் கிளிக் செய்வதன் மூலம் பதிவு செய்யலாம்."
+      }
+    },
+    {
+      "tag": "exam_schedule",
+      "patterns": [
+        "When is the exam?", "exam timetable", "test dates", "when does the exam start",
+        "Vibhagaya kawadda?", "Exam timetable eka koheda thiyenne", "Test dates monawada",
+        "Thervu eppo?", "Thervu neram", "Exam eppo start aaguthu"
+      ],
+      "responses": {
+        "en": "The final exam schedules are posted by your lecturers in the 'Announcements' section of each course page.",
+        "si": "අවසාන විභාග කාලසටහන් ඔබේ කථිකාචාර්යවරුන් විසින් සෑම පාඨමාලා පිටුවකම 'නිවේදන' (Announcements) අංශයේ පළ කරනු ලැබේ.",
+        "ta": "இறுதி தேர்வு நேர அட்டவணைகள் உங்கள் விரிவுரையாளர்களால் ஒவ்வொரு பாடப் பக்கத்தின் 'அறிவிப்புகள்' (Announcements) பிரிவில் வெளியிடப்படும்."
+      }
+    },
+    {
+      "tag": "password_reset",
+      "patterns": [
+        "I forgot my password", "How to reset password", "cant login",
+        "Mage password eka amathaka wuna", "Password reset karanne kohomada", "Login wenna be",
+        "En password maranthuvittathu", "Password reset seivathu eppadi", "Ulle poga mudiyavillai"
+      ],
+      "responses": {
+        "en": "To reset your password, click on the 'Forgot Password' link on the login page. An email will be sent to your registered student email address.",
+        "si": "ඔබේ මුරපදය යළි පිහිටුවීම සඳහා, පිවිසුම් පිටුවේ ඇති 'මුරපදය අමතක විය' (Forgot Password) සබැඳිය ක්ලික් කරන්න. ඔබේ ලියාපදිංචි ඊමේල් ලිපිනයට විද්‍යුත් තැපෑලක් යවනු ලැබේ.",
+        "ta": "உங்கள் கடவுச்சொல்லை மீட்டமைக்க, உள்நுழைவு பக்கத்தில் உள்ள 'கடவுச்சொல்லை மறந்துவிட்டேன்' (Forgot Password) இணைப்பைக் கிளிக் செய்யவும். உங்கள் பதிவுசெய்யப்பட்ட மின்னஞ்சலுக்கு ஒரு மின்னஞ்சல் அனுப்பப்படும்."
+      }
+    },
+    {
+      "tag": "physics_newtons_first_law",
+      "patterns": [
+        "What is Newton's first law?", "Explain inertia", "newtons 1st law", "physics laws",
+        "Newton ge palamu niyamaya kumakda", "Inertia kiyanne mokakda",
+        "Newtonin mudhalam vithi", "Inertia endral enna"
+      ],
+      "responses": {
+        "en": "Physics: Newton's First Law (Law of Inertia) states that an object will remain at rest or in uniform motion in a straight line unless acted upon by an external force.",
+        "si": "භෞතික විද්‍යාව: නිව්ටන්ගේ පළමු නියමය (අවස්ථිති නියමය) පවසන්නේ බාහිර බලයක් ක්‍රියා නොකරන්නේ නම්, නිශ්චල වස්තුවක් නිශ්චලතාවයේම පවතින බවත්, චලනය වන වස්තුවක් ඒකාකාර ප්‍රවේගයෙන් සරල රේඛාවක ගමන් කරන බවත්ය.",
+        "ta": "இயற்பியல்: நியூட்டனின் முதல் விதி (நிலைம விதி): ஒரு பொருளின் மீது புறவிசை செயல்படாத வரை, அந்தப் பொருள் தனது ஓய்வு நிலையையோ அல்லது சீரான இயக்க நிலையையோ மாற்றிக் கொள்ளாது."
+      }
+    },
+    {
+      "tag": "physics_gravity",
+      "patterns": [
+        "What is gravity?", "Explain gravitational force", "Why do things fall", "gravity in physics",
+        "Gurutwakashanaya kiyanne mokakda", "Gravity eka kiyala denna",
+        "Puviyeerppu visai endral enna", "Gravity patri sollu"
+      ],
+      "responses": {
+        "en": "Physics: Gravity is the universal force of attraction acting between all matter. On Earth, it gives weight to physical objects and causes them to fall toward the ground.",
+        "si": "භෞතික විද්‍යාව: ගුරුත්වාකර්ෂණය යනු සියලුම පදාර්ථ අතර ක්‍රියාත්මක වන විශ්වීය ආකර්ෂණ බලයයි. පෘථිවිය මත, එය වස්තූන්ට බර ලබා දෙන අතර ඒවා බිමට වැටීමට සලස්වයි.",
+        "ta": "இயற்பியல்: ஈர்ப்பு விசை என்பது அனைத்து பருப்பொருட்களுக்கும் இடையே செயல்படும் ஒரு உலகளாவிய ஈர்ப்பு விசையாகும். பூமியில், இது பொருட்களுக்கு எடையை அளித்து அவை கீழே விழக் காரணமாகிறது."
+      }
+    },
+    {
+      "tag": "al_physics_kinematics",
+      "patterns": [
+        "What are the equations of motion?", "A/L kinematics", "chaltha samikarana",
+        "v=u+at", "Equations for constant acceleration",
+        "Iyakkathin samnpaadugal", "Kinematics equations patri sollu"
+      ],
+      "responses": {
+        "en": "A/L Mechanics: For constant acceleration 'a', the key equations of motion are: 1) v = u + at, 2) s = ut + ½at², 3) v² = u² + 2as, where 'u' is initial velocity, 'v' is final velocity, and 's' is displacement.",
+        "si": "උසස් පෙළ යාන්ත්‍ර විද්‍යාව: නියත ත්වරණයක් (a) යටතේ ප්‍රධාන චලිත සමීකරණ වන්නේ: 1) v = u + at, 2) s = ut + ½at², 3) v² = u² + 2as. මෙහි 'u' ආරම්භක ප්‍රවේගය වන අතර 'v' අවසාන ප්‍රවේගය වේ.",
+        "ta": "உயர்தர இயந்திரவியல்: மாறாத முடுக்கம் 'a' க்கான முக்கிய இயக்கச் சமன்பாடுகள்: 1) v = u + at, 2) s = ut + ½at², 3) v² = u² + 2as."
+      }
+    },
+    {
+      "tag": "al_physics_momentum",
+      "patterns": [
+        "Conservation of momentum", "Explain linear momentum", "gamyatha sanrakshana niyamaya",
+        "What is momentum", "Utham ahivu vithi", "Utham kaappu vithi"
+      ],
+      "responses": {
+        "en": "A/L Mechanics: The Principle of Conservation of Linear Momentum states that if no external resultant force acts on a system, the total linear momentum of the system remains constant.",
+        "si": "උසස් පෙළ යාන්ත්‍ර විද්‍යාව: රේඛීය ගම්‍යතා සංස්ථිති නියමය පවසන්නේ, පද්ධතියක් මත බාහිර සම්ප්‍රයුක්ත බලයක් ක්‍රියා නොකරන්නේ නම්, එම පද්ධතියේ මුළු රේඛීය ගම්‍යතාවය නියතව පවතින බවයි.",
+        "ta": "உயர்தர இயந்திரவியல்: ஒரு அமைப்பின் மீது எவ்வித புறவிசையும் செயல்படாத போது, அந்த அமைப்பின் மொத்த நேர்கோட்டு உந்தம் மாறிலியாகும்."
+      }
+    },
+    {
+      "tag": "al_physics_friction",
+      "patterns": [
+        "Laws of friction", "What is static friction", "ghashanaya kiyanne mokakda",
+        "friction in mechanics", "Uraivu vithigal", "Uraivu visai"
+      ],
+      "responses": {
+        "en": "A/L Mechanics: Limiting friction is directly proportional to the normal reaction (F = μR). Static friction is self-adjusting up to this limiting value, while kinetic friction opposes active relative motion.",
+        "si": "උසස් පෙළ යාන්ත්‍ර විද්‍යාව: සීමාකාරී ඝර්ෂණය අභිලම්භ ප්‍රතික්‍රියාවට සමානුපාතික වේ (F = μR). මෙම සීමාකාරී අගය දක්වා ස්ථිතික ඝර්ෂණය ස්වයං-ගැලපුම් වන අතර, ගතික ඝර්ෂණය සාපේක්ෂ චලිතයට විරුද්ධව ක්‍රියා කරයි.",
+        "ta": "உயர்தர இயந்திரவியல்: எல்லை உராய்வு விசையானது செங்குத்து மறுதாக்கத்திற்கு நேர்விகித சமனாகும் (F = μR)."
+      }
+    },
+    {
+      "tag": "solve_kinematics_s",
+      "patterns": [
+        "solve for s when u=", "calculate displacement u=",
+        "solve s = ut + 0.5at^2", "find distance given u a t",
+        "solve mechanics u= a= t=",
+        "A car starts from rest and accelerates uniformly at a rate of",
+        "calculate the total distance traveled",
+        "find the displacement when it accelerates",
+        "car starts from rest accelerates for seconds distance"
+      ],
+      "responses": {
+        "en": "Let me calculate that for you...",
+        "si": "මම එය ගණනය කරන්නම්...",
+        "ta": "நான் அதை கணக்கிடுகிறேன்..."
+      }
+    }
+  ]
+}

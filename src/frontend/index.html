@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lanka LMS - AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-info">
+                <div class="avatar"></div>
+                <h2>LMS AI Assistant</h2>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button id="slides-btn" class="lang-select" style="background: #e91e63;">Slides</button>
+                <button id="recommend-btn" class="lang-select" style="background: var(--primary-gradient);">Courses</button>
+                <select id="model-selector" class="lang-select" style="background: #2196f3;">
+                    <option value="gemini">Gemini AI</option>
+                    <option value="llama">Llama 3</option>
+                </select>
+                <select id="language-selector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="si">සිංහල (Sinhala)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Course Recommendation Modal -->
+        <div id="recommend-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-btn" id="close-modal">&times;</span>
+                <h3>Course Recommendations</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Tell us what you want to learn!</p>
+                <div class="input-area" style="padding: 0; border: none; background: transparent;">
+                    <input type="text" id="rec-input" placeholder="E.g. Web development, Python, Sinhala..." autocomplete="off">
+                    <button id="get-rec-btn" aria-label="Get Recommendations">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </div>
+                <div id="rec-results" class="rec-results"></div>
+            </div>
+        </div>
+        <!-- Slides Modal -->
+        <div id="slides-modal" class="modal" style="display: none; align-items: center; justify-content: center;">
+            <div class="modal-content" style="width: 95%; max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+                <span class="close-btn" id="close-slides">&times;</span>
+                <h3 style="margin-bottom: 10px;">Generate Slide Deck</h3>
+                <div class="input-area" style="padding: 0; border: none; background: transparent; flex-shrink: 0;">
+                    <input type="text" id="slide-topic-input" placeholder="Enter topic (e.g., Physics, Exam)" autocomplete="off">
+                    <button id="get-slides-btn" aria-label="Generate Slides">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h20v14H2z"></path><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                    </button>
+                </div>
+                
+                <!-- Presentation View -->
+                <div id="presentation-view" style="display: none; flex: 1; flex-direction: column; justify-content: space-between; margin-top: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <h1 id="slide-title" style="color: var(--primary); margin-bottom: 20px; font-size: 2.5rem;">Title</h1>
+                        <p id="slide-content" style="font-size: 1.5rem; line-height: 1.6;">Content goes here...</p>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                        <button id="prev-slide" class="lang-select" style="padding: 10px 20px; font-weight: bold;">&#8592; Prev</button>
+                        <span id="slide-counter" style="color: var(--text-muted);">1 / 5</span>
+                        <button id="next-slide" class="lang-select" style="padding: 10px 20px; font-weight: bold; background: var(--primary-gradient);">Next &#8594;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <div class="message bot-message">
+                <div class="msg-bubble">Hello! I am your AI assistant. How can I help you with your studies today?</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your question here..." autocomplete="off">
+            <button id="send-btn" aria-label="Send Message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+    <script src="script.js?v=3"></script>
+</body>
+</html>

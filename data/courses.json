@@ -1,0 +1,38 @@
+[
+  {
+    "id": "CS101",
+    "title": "Introduction to Python Programming",
+    "description": "Learn the basics of Python programming, perfect for beginners looking to enter software engineering or data science. Python moolika karunu igenaganna.",
+    "tags": ["programming", "python", "software", "beginner", "coding", "tech"]
+  },
+  {
+    "id": "AI201",
+    "title": "Artificial Intelligence Fundamentals",
+    "description": "Understand the basics of AI, machine learning, and neural networks. Kruthima buddhiya ha yanthra iganuma.",
+    "tags": ["ai", "machine learning", "neural networks", "advanced", "tech", "data science"]
+  },
+  {
+    "id": "SL101",
+    "title": "Sinhala Language and Literature",
+    "description": "Explore the rich history of Sinhala literature, poetry, and grammar. Sinhala sahithyaya, kavi, ha wiyakarana.",
+    "tags": ["sinhala", "literature", "language", "arts", "history"]
+  },
+  {
+    "id": "TL101",
+    "title": "Tamil Language and Grammar",
+    "description": "A comprehensive guide to Tamil language, grammar, and classical literature. Tamil mozhi, ilakkanam, matrum ilakkiyam.",
+    "tags": ["tamil", "literature", "language", "arts", "grammar"]
+  },
+  {
+    "id": "WEB301",
+    "title": "Full Stack Web Development",
+    "description": "Build beautiful websites using HTML, CSS, JavaScript, and FastAPI. Web sayit nirmanaya kireema.",
+    "tags": ["web", "development", "html", "css", "javascript", "fastapi", "programming"]
+  },
+  {
+    "id": "BUS101",
+    "title": "Business Administration and Management",
+    "description": "Learn core business principles, management strategies, and entrepreneurship. Viyapara kalamanakaranaya.",
+    "tags": ["business", "management", "entrepreneurship", "finance"]
+  }
+]
