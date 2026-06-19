@@ -124,7 +124,7 @@ def chat(request: ChatRequest):
     print("DEBUG probabilities:", probabilities)
     
     if has_math_intent or "solve" in text_lower or "calculate" in text_lower:
-        prompt = f"You are an expert A/L Physics Tutor. A student asks: '{request.text}'. Provide a step-by-step mathematical solution. \n\nCRITICAL: You MUST write your ENTIRE response in {lang_name}. Do not use English unless the selected language is English.\n\nFormat your response beautifully using HTML tags (e.g. <b> for bold, <br> for newlines). Do NOT use markdown. Start directly with the solution."
+        prompt = f"You are an expert A/L Physics Tutor. A student asks: '{request.text}'. Provide a step-by-step mathematical solution. \n\nCRITICAL: First, evaluate if the question is related to Physics or Math. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST write your ENTIRE response in {lang_name}. Do not use English unless the selected language is English.\n\nFormat your response beautifully using HTML tags (e.g. <b> for bold, <br> for newlines). Do NOT use markdown. Start directly with the solution."
         if request.model == "llama" and groq_client:
             try:
                 sys_prompt = f"You are a native {lang_name} speaking Physics tutor. You NEVER output English unless {lang_name} is English. All explanations MUST be translated to and written entirely in {lang_name}."
@@ -160,7 +160,7 @@ def chat(request: ChatRequest):
             
             if best_score > 0.05: # Threshold for PDF matches
                 chunk_text = pdf_chunks[best_idx]
-                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. Explain the answer using ONLY this textbook excerpt as your source of truth: '{chunk_text}'. \n\nCRITICAL: You MUST write your ENTIRE explanation in {lang_name}. Do not use English unless the selected language is English. If the textbook excerpt does NOT contain the answer, you MUST say 'The textbook does not contain information about this topic' and nothing else. Do NOT use outside knowledge.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
+                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. Explain the answer using ONLY this textbook excerpt as your source of truth: '{chunk_text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST write your ENTIRE explanation in {lang_name}. Do not use English unless the selected language is English. If the textbook excerpt does NOT contain the answer, you MUST say 'The textbook does not contain information about this topic' and nothing else. Do NOT use outside knowledge.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
                 
                 if request.model == "llama" and groq_client:
                     try:
@@ -184,7 +184,7 @@ def chat(request: ChatRequest):
                     response_text = f"<b>Textbook Match:</b><br><br>{chunk_text}"
                     predicted_intent = "pdf_rag_fallback"
             else:
-                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
+                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
                 if request.model == "llama" and groq_client:
                     try:
                         response = groq_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
@@ -205,7 +205,7 @@ def chat(request: ChatRequest):
                     response_text = "I'm sorry, I couldn't find an answer in my knowledge base or the textbook."
                     predicted_intent = "unknown"
         else:
-            prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
+            prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
             if request.model == "llama" and groq_client:
                 try:
                     response = groq_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
