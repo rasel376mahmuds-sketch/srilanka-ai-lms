@@ -160,7 +160,7 @@ def chat(request: ChatRequest):
             
             if best_score > 0.05: # Threshold for PDF matches
                 chunk_text = pdf_chunks[best_idx]
-                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. Explain the answer using ONLY this textbook excerpt as your source of truth: '{chunk_text}'. \n\nCRITICAL: You MUST write your ENTIRE explanation in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
+                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. Explain the answer using ONLY this textbook excerpt as your source of truth: '{chunk_text}'. \n\nCRITICAL: You MUST write your ENTIRE explanation in {lang_name}. Do not use English unless the selected language is English. If the textbook excerpt does NOT contain the answer, you MUST say 'The textbook does not contain information about this topic' and nothing else. Do NOT use outside knowledge.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
                 
                 if request.model == "llama" and groq_client:
                     try:
