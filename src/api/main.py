@@ -5,7 +5,7 @@ import joblib
 import json
 import os
 from sklearn.metrics.pairwise import cosine_similarity
-from api.physics_solver import solve_kinematics_s
+from .physics_solver import solve_kinematics_s
 import google.generativeai as genai
 from groq import Groq
 from dotenv import load_dotenv
