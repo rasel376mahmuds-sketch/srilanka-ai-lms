@@ -107,124 +107,99 @@ def chat(request: ChatRequest):
     lang_map = {"en": "English", "si": "Sinhala", "ta": "Tamil"}
     lang_name = lang_map.get(request.language, "English")
     
-    probabilities = chatbot_pipeline.predict_proba([request.text])[0]
-    max_prob = max(probabilities)
-    predicted_intent = chatbot_pipeline.classes_[probabilities.argmax()]
-    
-    text_lower = request.text.lower()
-    
-    # 1. Intercept Math/Physics questions to Gemini (Highest Priority)
-    math_keywords = ["solve", "calculate", "find", "value", "velocity", "acceleration", "distance", "mass", "force", "energy", "equation"]
-    has_math_intent = any(kw in text_lower for kw in math_keywords) and any(char.isdigit() for char in text_lower)
-    
-    print("DEBUG text:", request.text)
-    print("DEBUG has_math_intent:", has_math_intent)
-    print("DEBUG max_prob:", max_prob)
-    print("DEBUG predicted_intent:", predicted_intent)
-    print("DEBUG probabilities:", probabilities)
-    
-    if has_math_intent or "solve" in text_lower or "calculate" in text_lower:
-        prompt = f"You are an expert A/L Physics Tutor. A student asks: '{request.text}'. Provide a step-by-step mathematical solution. \n\nCRITICAL: First, evaluate if the question is related to Physics or Math. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST write your ENTIRE response in {lang_name}. Do not use English unless the selected language is English.\n\nFormat your response beautifully using HTML tags (e.g. <b> for bold, <br> for newlines). Do NOT use markdown. Start directly with the solution."
-        if request.model == "llama" and groq_client:
-            try:
-                sys_prompt = f"You are a native {lang_name} speaking Physics tutor. You NEVER output English unless {lang_name} is English. All explanations MUST be translated to and written entirely in {lang_name}."
-                response = groq_client.chat.completions.create(messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
-                response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Llama 3</b></i></div>{response.choices[0].message.content}"
-                predicted_intent = "llama_solver"
-            except Exception as e:
-                response_text = f"Llama API Error: {str(e)}"
-                predicted_intent = "llama_error"
-        elif gemini_model:
-            try:
-                response = gemini_model.generate_content(prompt)
-                response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Gemini AI</b></i></div>{response.text}"
-                predicted_intent = "gemini_solver"
-            except Exception as e:
-                response_text = f"Gemini API Error: {str(e)}"
-                predicted_intent = "gemini_error"
-        else:
-            response_text = "<b>Error:</b> I need an API Key to solve complex math problems! Please add it to the .env file."
-            predicted_intent = "api_error"
-            
-    # 2. Match standard Intents only if confidence is decent
-    elif predicted_intent in intent_responses and max_prob > 0.6:
-        response_text = intent_responses[predicted_intent].get(request.language, "Sorry, I don't have a response in that language.")
-        
-    # 3. Fallback to PDF Textbook search
+    # 1. Llama classification: check if query is a physics question
+    is_physics = False
+    if groq_client:
+        try:
+            classification_prompt = (
+                "You are an AI assistant. Determine if the following user query is a physics question. "
+                "Respond with ONLY 'yes' or 'no' in lowercase, without any punctuation, explanations, or additional text.\n\n"
+                f"Query: \"{request.text}\""
+            )
+            response = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": classification_prompt}],
+                model="llama-3.3-70b-versatile"
+            )
+            classification_result = response.choices[0].message.content.strip().lower()
+            print(f"DEBUG Llama Physics Classification: '{classification_result}' for query: '{request.text}'")
+            if "yes" in classification_result:
+                is_physics = True
+        except Exception as e:
+            print("Llama physics classification API error:", e)
+            is_physics = True  # Fallback to True if Llama API fails, to avoid blocking physics questions
     else:
-        if pdf_vectorizer is not None and pdf_matrix is not None and len(pdf_chunks) > 0:
+        is_physics = True  # Fallback if Llama is not configured
+        
+    if not is_physics:
+        # Llama replies: "this is not physics question"
+        if request.language == "si":
+            reply_text = "මෙය භෞතික විද්‍යා ප්‍රශ්නයක් නොවේ"
+        elif request.language == "ta":
+            reply_text = "இது பௌதிகவியல் கேள்வி அல்ல"
+        else:
+            reply_text = "this is not physics question"
+        response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Llama 3</b></i></div>{reply_text}"
+        return ChatResponse(intent="llama_non_physics", response=response_text)
+        
+    # 2. Redirect to user-selected model
+    # Get textbook context if available
+    textbook_context = ""
+    if pdf_vectorizer is not None and pdf_matrix is not None and len(pdf_chunks) > 0:
+        try:
             query_vec = pdf_vectorizer.transform([request.text])
             similarities = cosine_similarity(query_vec, pdf_matrix)[0]
             best_idx = similarities.argmax()
             best_score = similarities[best_idx]
+            if best_score > 0.05:
+                textbook_context = pdf_chunks[best_idx]
+        except Exception as e:
+            print("Error retrieving textbook context:", e)
             
-            if best_score > 0.05: # Threshold for PDF matches
-                chunk_text = pdf_chunks[best_idx]
-                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. Explain the answer using ONLY this textbook excerpt as your source of truth: '{chunk_text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST write your ENTIRE explanation in {lang_name}. Do not use English unless the selected language is English. If the textbook excerpt does NOT contain the answer, you MUST say 'The textbook does not contain information about this topic' and nothing else. Do NOT use outside knowledge.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
-                
-                if request.model == "llama" and groq_client:
-                    try:
-                        response = groq_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
-                        response_text = f"<b>Llama 3 Explanation:</b><br>{response.choices[0].message.content}<br><br><div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-top: 15px; font-size: 0.9em;'><b>Textbook Reference:</b><br><i>{chunk_text}</i></div>"
-                        predicted_intent = "llama_rag"
-                    except Exception as e:
-                        print("Llama RAG Error:", str(e))
-                        response_text = f"<b>Llama Error:</b> {str(e)}<br><br><b>Textbook Match:</b><br><br>{chunk_text}"
-                        predicted_intent = "pdf_rag_fallback"
-                elif gemini_model:
-                    try:
-                        response = gemini_model.generate_content(prompt)
-                        response_text = f"<b>Gemini AI Explanation:</b><br>{response.text}<br><br><div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-top: 15px; font-size: 0.9em;'><b>Textbook Reference:</b><br><i>{chunk_text}</i></div>"
-                        predicted_intent = "gemini_rag"
-                    except Exception as e:
-                        print("Gemini RAG Error:", str(e))
-                        response_text = f"<b>Gemini Error:</b> {str(e)}<br><br><b>Textbook Match:</b><br><br>{chunk_text}"
-                        predicted_intent = "pdf_rag_fallback"
-                else:
-                    response_text = f"<b>Textbook Match:</b><br><br>{chunk_text}"
-                    predicted_intent = "pdf_rag_fallback"
-            else:
-                prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
-                if request.model == "llama" and groq_client:
-                    try:
-                        response = groq_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
-                        response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Llama 3</b></i></div>{response.choices[0].message.content}"
-                        predicted_intent = "llama_general"
-                    except Exception as e:
-                        response_text = "I'm sorry, I couldn't find an answer in my knowledge base or the textbook."
-                        predicted_intent = "unknown"
-                elif gemini_model:
-                    try:
-                        response = gemini_model.generate_content(prompt)
-                        response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Gemini AI</b></i></div>{response.text}"
-                        predicted_intent = "gemini_general"
-                    except Exception as e:
-                        response_text = "I'm sorry, I couldn't find an answer in my knowledge base or the textbook."
-                        predicted_intent = "unknown"
-                else:
-                    response_text = "I'm sorry, I couldn't find an answer in my knowledge base or the textbook."
-                    predicted_intent = "unknown"
-        else:
-            prompt = f"You are an A/L Physics Tutor. A student asks: '{request.text}'. \n\nCRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\nFormat nicely with HTML tags like <b> and <br>, do not use markdown."
-            if request.model == "llama" and groq_client:
-                try:
-                    response = groq_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
-                    response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Llama 3</b></i></div>{response.choices[0].message.content}"
-                    predicted_intent = "llama_general"
-                except Exception as e:
-                    response_text = "I'm sorry, I couldn't understand your question."
-                    predicted_intent = "unknown"
-            elif gemini_model:
-                try:
-                    response = gemini_model.generate_content(prompt)
-                    response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Gemini AI</b></i></div>{response.text}"
-                    predicted_intent = "gemini_general"
-                except Exception as e:
-                    response_text = "I'm sorry, I couldn't understand your question."
-                    predicted_intent = "unknown"
-            else:
-                response_text = "I'm sorry, I couldn't understand your question."
-                predicted_intent = "unknown"
+    if textbook_context:
+        prompt = (
+            f"You are an expert A/L Physics Tutor. A student asks: '{request.text}'. "
+            f"Explain the answer using ONLY this textbook excerpt as your source of truth: '{textbook_context}'. \n\n"
+            f"CRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. "
+            f"You MUST write your ENTIRE response in {lang_name}. Do not use English unless the selected language is English. If the textbook excerpt does NOT contain the answer, you MUST say 'The textbook does not contain information about this topic' and nothing else. Do NOT use outside knowledge.\n\n"
+            "Format nicely with HTML tags like <b> and <br>, do not use markdown."
+        )
+    else:
+        prompt = (
+            f"You are an expert A/L Physics Tutor. A student asks: '{request.text}'. Provide a step-by-step mathematical solution or explanation as appropriate. \n\n"
+            f"CRITICAL: First, evaluate if the question is related to Physics. If it is NOT related, you MUST reply ONLY with 'This is not a physics question' (translated into {lang_name} if needed) and nothing else. "
+            f"You MUST answer the question ENTIRELY in {lang_name}. Do not use English unless the selected language is English.\n\n"
+            "Format nicely with HTML tags like <b> and <br>, do not use markdown. Start directly with the solution/explanation."
+        )
+        
+    if request.model == "llama" and groq_client:
+        try:
+            sys_prompt = f"You are a native {lang_name} speaking Physics tutor. You NEVER output English unless {lang_name} is English. All explanations MUST be translated to and written entirely in {lang_name}."
+            response = groq_client.chat.completions.create(
+                messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": prompt}],
+                model="llama-3.3-70b-versatile"
+            )
+            ans_text = response.choices[0].message.content.strip()
+            response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Llama 3</b></i></div>{ans_text}"
+            if textbook_context:
+                response_text += f"<br><br><div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-top: 15px; font-size: 0.9em;'><b>Textbook Reference:</b><br><i>{textbook_context}</i></div>"
+            predicted_intent = "llama_physics_solver"
+        except Exception as e:
+            response_text = f"Llama API Error: {str(e)}"
+            predicted_intent = "llama_error"
+    elif gemini_model:
+        try:
+            response = gemini_model.generate_content(prompt)
+            ans_text = response.text.strip()
+            response_text = f"<div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px; font-size: 0.9em;'><i>Powered by <b>Gemini AI</b></i></div>{ans_text}"
+            if textbook_context:
+                response_text += f"<br><br><div style='background: rgba(255,255,255,0.05); padding: 10px; border-left: 4px solid #2196f3; margin-top: 15px; font-size: 0.9em;'><b>Textbook Reference:</b><br><i>{textbook_context}</i></div>"
+            predicted_intent = "gemini_physics_solver"
+        except Exception as e:
+            response_text = f"Gemini API Error: {str(e)}"
+            predicted_intent = "gemini_error"
+    else:
+        response_text = "<b>Error:</b> Neither Gemini nor Llama model could be initialized."
+        predicted_intent = "api_error"
         
     return ChatResponse(intent=predicted_intent, response=response_text)
 
